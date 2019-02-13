@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+  <group android:checkableBehavior="single">
+    <item
+        android:id="@+id/qr_fragment"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="QR Generate"/>
+    <item
+        android:id="@+id/nav_player"
+        android:icon="@android:drawable/ic_media_play"
+        android:title="Player"/>
+    <!--<item-->
+    <!--android:id="@+id/nav_slideshow"-->
+    <!--android:icon="@drawable/ic_menu_slideshow"-->
+    <!--android:title="Slideshow"/>-->
+    <!--<item-->
+    <!--android:id="@+id/nav_manage"-->
+    <!--android:icon="@drawable/ic_menu_manage"-->
+    <!--android:title="Tools"/>-->
+  </group>
+
+  <item android:title="Spotify">
+    <menu>
+      <item
+          android:id="@+id/qr_reader"
+          android:icon="@drawable/ic_menu_manage"
+          android:title="QR reader"/>
+      <item
+          android:id="@+id/nav_recent"
+          android:icon="@drawable/ic_queue_music"
+          android:title="Recently played"/>
+
+      <item
+          android:id="@+id/nav_client"
+          android:icon="@drawable/ic_library_music"
+          android:title="Tracks"/>
+    </menu>
+  </item>
+
+</menu>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "538436959390",
+    "firebase_url": "https://musicplayersample-f7faa.firebaseio.com",
+    "project_id": "musicplayersample-f7faa",
+    "storage_bucket": "musicplayersample-f7faa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:538436959390:android:466e2ebe4dd4a87f",
+        "android_client_info": {
+          "package_name": "com.wasseemb.musicplayersample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "538436959390-srctfiuj6c02l8fmfsrv24462qbmh6j4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wasseemb.musicplayersample",
+            "certificate_hash": "a476d411dca1a4fef819df8c9d09f9c3c1b66c5d"
+          }
+        },
+        {
+          "client_id": "538436959390-atgd2naqlm4pa5rsf5444os8grta5nmu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7pQYgt1jV6H7xDoTsgTQRS_BwvFGCdOo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "538436959390-atgd2naqlm4pa5rsf5444os8grta5nmu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
