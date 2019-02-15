@@ -24,6 +24,7 @@ import com.wasseemb.musicplayersample.api.SpotifyApiService
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import nz.co.trademe.covert.Covert
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -50,6 +51,14 @@ class FirebaseTrackFragment : Fragment() {
   private var simpleTrackArray = ArrayList<FirebaseTrack>()
   private var uriArray = ArrayList<String>()
   lateinit var materialButton: MaterialButton
+  val repository = DummySwipeRepository()
+
+
+  val covertConfig = Covert.Config(
+      iconRes = R.drawable.ic_baseline_arrow_upward, // The icon to show
+      iconDefaultColorRes = R.color.white,            // The color of the icon
+      actionColorRes = R.color.colorPrimary           // The color of the background
+  )
 
   //private var listener: OnFragmentInteractionListener? = null
 
@@ -64,7 +73,7 @@ class FirebaseTrackFragment : Fragment() {
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
       savedInstanceState: Bundle?): View? {
     // Inflate the layout for this fragment
-    val rootView = inflater.inflate(layout.trackitemdata_list, container, false)
+    val rootView = inflater.inflate(layout.firebase_list, container, false)
     setupRecyclerView(rootView)
     getTracksFromFirebase()
 
@@ -106,14 +115,35 @@ class FirebaseTrackFragment : Fragment() {
   private fun addTracksToPlaylist(body: HashMap<String, ArrayList<String>>) {
     SpotifyApiService.create(param1!!).addTracksToPlaylist(param2!!, body).observeOn(
         AndroidSchedulers.mainThread())
-        .subscribeOn(Schedulers.io()).subscribe {
-        }
+        .subscribeOn(Schedulers.io()).subscribe()
   }
 
   private fun setupRecyclerView(view: View) {
-    recyclerView = view.findViewById(R.id.trackitemdata_list)
+    recyclerView = view.findViewById(R.id.firebase_list)
+    val covert = Covert.with(covertConfig)
+        .setIsActiveCallback {
+          // This is a callback to check if the item is active, i.e checked
+          repository.isActive(it.adapterPosition)
+        }
+        .doOnSwipe { viewHolder, _ ->
+          // This callback is fired when a ViewHolder is swiped
+          repository.toggleActiveState(viewHolder.adapterPosition)
+          Log.d("CurrentPos", viewHolder.adapterPosition.toString())
+          if (repository.isActive(viewHolder.adapterPosition))
+            simpleTrackArray[viewHolder.adapterPosition].vote++
+          else
+            simpleTrackArray[viewHolder.adapterPosition].vote--
+          val database = FirebaseDatabase.getInstance()
+          database.reference.child(
+              "Songs/" + simpleTrackArray[viewHolder.adapterPosition].uri).setValue(
+              simpleTrackArray[viewHolder.adapterPosition])
+          trackAdapter.notifyItemChanged(viewHolder.adapterPosition)
+
+        }
+        .attachTo(recyclerView)
+
     recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-    trackAdapter = FirebaseTrackAdapter()
+    trackAdapter = FirebaseTrackAdapter(covert)
     recyclerView.adapter = trackAdapter
   }
 
@@ -141,7 +171,6 @@ class FirebaseTrackFragment : Fragment() {
         })
 
   }
-
 
   override fun onStop() {
     super.onStop()

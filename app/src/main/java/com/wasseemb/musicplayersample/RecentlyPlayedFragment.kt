@@ -45,8 +45,6 @@ private var mSpotifyAppRemote: SpotifyAppRemote? = null
 class RecentlyPlayedFragment : Fragment(), ItemClickListener {
   // TODO: Rename and change types of parameters
   private var token: String? = null
-  //private var listener: OnFragmentInteractionListener? = null
-  //private var simpleTrackArray = ArrayList<FirebaseTrack>()
   private lateinit var recyclerView: RecyclerView
   private lateinit var trackAdapter: RecentlyPlayedAdapter
   private lateinit var songHashMap: HashMap<String, FirebaseTrack>

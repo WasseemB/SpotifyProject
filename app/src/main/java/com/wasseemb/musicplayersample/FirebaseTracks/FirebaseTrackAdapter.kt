@@ -12,15 +12,17 @@ import com.wasseemb.musicplayersample.R.id
 import com.wasseemb.musicplayersample.R.layout
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter.ListViewHolder
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
+import nz.co.trademe.covert.Covert
 
 
-class FirebaseTrackAdapter : ListAdapter<FirebaseTrack, ListViewHolder>(
+class FirebaseTrackAdapter(private val covert: Covert) : ListAdapter<FirebaseTrack, ListViewHolder>(
     FirebaseTrackCallBack()) {
+
 
   override fun onCreateViewHolder(parent: ViewGroup, viewtype: Int): ListViewHolder {
 
     val viewHolder = ListViewHolder(parent.inflate(
-        layout.trackitemdata_list_content))
+        layout.firebase_list_content))
     //viewHolder.itemView.setOnClickListener {
     //val position = viewHolder.adapterPosition
     //if (position != RecyclerView.NO_POSITION)
@@ -31,6 +33,7 @@ class FirebaseTrackAdapter : ListAdapter<FirebaseTrack, ListViewHolder>(
   }
 
   override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
+    covert.drawCornerFlag(holder)
     holder.bindTo(getItem(position)!!)
   }
 
@@ -39,6 +42,8 @@ class FirebaseTrackAdapter : ListAdapter<FirebaseTrack, ListViewHolder>(
         id.tvTrackTitle)
     private val trackArtistTextView: TextView = itemView.findViewById(
         id.tvTrackArtist)
+    private val tvTrackVote: TextView = itemView.findViewById(
+        id.tvTrackVote)
     private val trackAlbumImageView: ImageView = itemView.findViewById(
         id.imgAlbumImage)
 
@@ -46,6 +51,7 @@ class FirebaseTrackAdapter : ListAdapter<FirebaseTrack, ListViewHolder>(
     fun bindTo(item: FirebaseTrack) {
       trackTitleTextView.text = item.name
       trackArtistTextView.text = item.artist
+      tvTrackVote.text = item.vote.toString()
       trackAlbumImageView.loadUrl(item.albumImageUrl)
 
     }

@@ -16,7 +16,7 @@ import com.wasseemb.musicplayersample.vo.FirebaseTrack
 
 fun ImageView.loadUrl(url: String?) {
   if (url == "") {
-    Picasso.get().load(url).into(this)
+    Picasso.get().load(R.color.colorPrimary).into(this)
   } else
     Picasso.get().load(url).into(this)
 
