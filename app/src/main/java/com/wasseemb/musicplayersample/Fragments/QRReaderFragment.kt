@@ -1,12 +1,12 @@
-package com.wasseemb.musicplayersample
+package com.wasseemb.musicplayersample.Fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.annotation.NonNull
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
+import androidx.annotation.NonNull
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +15,8 @@ import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
+import com.wasseemb.musicplayersample.R
+import com.wasseemb.musicplayersample.R.layout
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -49,8 +51,9 @@ class QRReaderFragment : Fragment() {
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
       savedInstanceState: Bundle?): View? {
     // Inflate the layout for this fragment
-    val view = inflater.inflate(R.layout.fragment_qreader, container, false)
-    dbvScanner = view.findViewById(R.id.dbv_barcode)
+    val view = inflater.inflate(layout.fragment_qreader, container, false)
+    dbvScanner = view.findViewById<BarcodeView>(
+        R.id.dbv_barcode)
     val txtViewQr = view.findViewById<TextView>(R.id.qrRead)
     requestPermission()
     dbvScanner?.cameraInstance?.cameraSettings?.requestedCameraId = 1
@@ -87,40 +90,6 @@ class QRReaderFragment : Fragment() {
     }
   }
 
-  // TODO: Rename method, update argument and hook method into UI event
-//  fun onButtonPressed(uri: Uri) {
-//    listener?.onFragmentInteraction(uri)
-//  }
-
-//  override fun onAttach(context: Context) {
-//    super.onAttach(context)
-//    if (context is OnFragmentInteractionListener) {
-//      listener = context
-//    } else {
-//      throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-//    }
-//  }
-
-//  override fun onDetach() {
-//    super.onDetach()
-//    listener = null
-//  }
-
-  /**
-   * This interface must be implemented by activities that contain this
-   * fragment to allow an interaction in this fragment to be communicated
-   * to the activity and potentially other fragments contained in that
-   * activity.
-   *
-   *
-   * See the Android Training lesson [Communicating with Other Fragments]
-   * (http://developer.android.com/training/basics/fragments/communicating.html)
-   * for more information.
-   */
-//  interface OnFragmentInteractionListener {
-//    // TODO: Update argument type and name
-//    fun onFragmentInteraction(uri: Uri)
-//  }
 
   companion object {
     /**

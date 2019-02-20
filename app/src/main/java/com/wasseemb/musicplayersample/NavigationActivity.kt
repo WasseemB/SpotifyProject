@@ -1,20 +1,29 @@
 package com.wasseemb.musicplayersample
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.view.GravityCompat
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.room.Room
+import com.google.android.material.navigation.NavigationView
 import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationResponse
+import com.wasseemb.musicplayersample.Database.FirebaseTracksDatabase
+import com.wasseemb.musicplayersample.Fragments.FirebaseTrackFragment
+import com.wasseemb.musicplayersample.Fragments.QRFragment
+import com.wasseemb.musicplayersample.Fragments.QRReaderFragment
+import com.wasseemb.musicplayersample.Fragments.RecentlyPlayedFragment
+import com.wasseemb.musicplayersample.Fragments.TrackFragment
 import com.wasseemb.musicplayersample.Utils.REQUEST_CODE
 import com.wasseemb.musicplayersample.Utils.SpotifyHelper
 import com.wasseemb.musicplayersample.api.SpotifyApiService
@@ -31,24 +40,21 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
   private lateinit var authToken: String
   private lateinit var playlistId: String
+  private lateinit var spotifyRepository: SpotifyRepository
+  private lateinit var viewModelFactory: ViewModelProvider.Factory
+  private lateinit var spotifyViewModel: SpotifyViewModel
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_navigation)
     setSupportActionBar(toolbar)
 
-    fab.setOnClickListener { view ->
-      Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-          .setAction("Action", null).show()
-      //SpotifyHelper().createAuthRequest(this)
-    }
-
     fab.text = "Connect to Spotify"
     fab.setOnClickListener {
       SpotifyHelper().createAuthRequest(this)
       nav_view.setCheckedItem(R.id.nav_recent)
-      fab.visibility = View.INVISIBLE
+      //fab.visibility = View.INVISIBLE
     }
-
 
     val toggle = ActionBarDrawerToggle(
         this, drawer_layout, toolbar, R.string.navigation_drawer_open,
@@ -60,18 +66,21 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
   }
 
   private fun setUpUserData(authToken: String) {
-    SpotifyApiService.create(authToken).getUserData().observeOn(
-        AndroidSchedulers.mainThread())
-        .subscribeOn(Schedulers.io()).subscribe {
-          val navigationView = findViewById<View>(R.id.nav_view) as NavigationView
-          val headerView = navigationView.getHeaderView(0)
-          val navUsername = headerView.findViewById(R.id.nav_header_title) as TextView
-          val navMail = headerView.findViewById(R.id.nav_header_mail) as TextView
+    spotifyRepository = SpotifyRepository(SpotifyApiService.create(authToken),
+        provideDatabase(this).firebaseDao())
+    viewModelFactory = SpotifyViewModelFactory(spotifyRepository)
+    spotifyViewModel = ViewModelProviders.of(this, viewModelFactory).get(
+        SpotifyViewModel::class.java)
 
-          navUsername.text = it.id
-          navMail.text = it.email
-          createPlayList(authToken, it.id)
-        }
+    val navigationView = findViewById<View>(R.id.nav_view) as NavigationView
+    val headerView = navigationView.getHeaderView(0)
+    val navUsername = headerView.findViewById(R.id.nav_header_title) as TextView
+    val navMail = headerView.findViewById(R.id.nav_header_mail) as TextView
+    spotifyRepository.getUserData().subscribe { userResponse ->
+      navUsername.text = userResponse.id
+      navMail.text = userResponse.email
+      //createPlayList(authToken, userResponse.id)
+    }
 
   }
 
@@ -97,7 +106,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         AuthenticationResponse.Type.TOKEN -> {
           authToken = response.accessToken
           setUpUserData(authToken)
-          setUpFragment(authToken)
+          setUpFragment()
 
         }
 
@@ -108,10 +117,10 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
   }
 
-  private fun setUpFragment(authToken: String) {
+  private fun setUpFragment() {
     val newFragment: Fragment
     val transaction = supportFragmentManager.beginTransaction()
-    newFragment = RecentlyPlayedFragment.newInstance(authToken)
+    newFragment = RecentlyPlayedFragment.newInstance(spotifyRepository)
     transaction.replace(R.id.content_data, newFragment)
     transaction.addToBackStack(null)
     transaction.commit()
@@ -147,10 +156,10 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     val transaction = supportFragmentManager.beginTransaction()
     when (item.itemId) {
       R.id.nav_recent -> {
-        newFragment = RecentlyPlayedFragment.newInstance(authToken)
+        newFragment = RecentlyPlayedFragment.newInstance(spotifyRepository)
       }
       R.id.nav_client -> {
-        newFragment = TrackFragment.newInstance(authToken)
+        newFragment = TrackFragment.newInstance(spotifyRepository)
       }
       R.id.nav_player -> {
         newFragment = FirebaseTrackFragment.newInstance(authToken, playlistId)
@@ -168,6 +177,13 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     drawer_layout.closeDrawer(GravityCompat.START)
     return true
+  }
+
+  fun provideDatabase(context: Context): FirebaseTracksDatabase {
+
+    return Room.databaseBuilder(context, FirebaseTracksDatabase::class.java,
+        "firebasetrackdb.db").build()
+
   }
 
 

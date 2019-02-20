@@ -1,12 +1,12 @@
 package com.wasseemb.musicplayersample.api
 
-import com.wasseemb.musicplayersample.vo.HeaderInterceptor
 import com.wasseemb.musicplayersample.vo.Playlists
 import com.wasseemb.musicplayersample.vo.RecentlyPlayed
 import com.wasseemb.musicplayersample.vo.Tracks
 import com.wasseemb.musicplayersample.vo.Tracks.Item.Track
 import com.wasseemb.musicplayersample.vo.UserResponse
 import io.reactivex.Observable
+import io.reactivex.Single
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
@@ -34,10 +34,10 @@ interface SpotifyApiService {
       : Observable<Track>
 
   @GET("me")
-  fun getUserData(): Observable<UserResponse>
+  fun getUserData(): Single<UserResponse>
 
   @GET("me/player/recently-played")
-  fun getRecentlyPlayed(): Observable<RecentlyPlayed>
+  fun getRecentlyPlayed(): Single<RecentlyPlayed>
 
 
   @POST("users/{user_id}/playlists")

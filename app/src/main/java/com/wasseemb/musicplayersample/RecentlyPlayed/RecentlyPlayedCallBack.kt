@@ -1,6 +1,6 @@
 package com.wasseemb.musicplayersample.RecentlyPlayed
 
-import android.support.v7.util.DiffUtil
+import androidx.recyclerview.widget.DiffUtil
 import com.wasseemb.musicplayersample.vo.RecentlyPlayed
 
 class RecentlyPlayedCallBack : DiffUtil.ItemCallback<RecentlyPlayed.Item>() {

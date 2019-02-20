@@ -1,15 +1,17 @@
-package com.wasseemb.musicplayersample
+package com.wasseemb.musicplayersample.Fragments
+
 
 import android.content.ContentValues.TAG
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.button.MaterialButton
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.content.FileProvider
-import android.support.v4.print.PrintHelper
+import com.google.android.material.button.MaterialButton
+import androidx.fragment.app.Fragment
+import androidx.core.content.FileProvider
+import androidx.print.PrintHelper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +22,12 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.wasseemb.musicplayersample.Extensions.PreferenceHelper.defaultPrefs
+import com.wasseemb.musicplayersample.Extensions.PreferenceHelper.get
+import com.wasseemb.musicplayersample.Extensions.PreferenceHelper.set
+import com.wasseemb.musicplayersample.R
+import com.wasseemb.musicplayersample.R.layout
+import com.wasseemb.musicplayersample.Utils.FIREBASE_UNIQUE_ID
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -43,6 +51,9 @@ class QRFragment : Fragment() {
   // TODO: Rename and change types of parameters
   private var param1: String? = null
   private var param2: String? = null
+  private lateinit var prefs: SharedPreferences
+  private var firebaseName: String? = null
+
   //private var listener: OnFragmentInteractionListener? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,50 +62,87 @@ class QRFragment : Fragment() {
       param1 = it.getString(ARG_PARAM1)
       param2 = it.getString(ARG_PARAM2)
     }
+    context?.let {
+      prefs = defaultPrefs(it)
+    }
+    firebaseName = prefs[FIREBASE_UNIQUE_ID, ""]
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
       savedInstanceState: Bundle?): View? {
     // Inflate the layout for this fragment
-    val view = inflater.inflate(R.layout.fragment_qr, container, false)
+    val view = inflater.inflate(layout.fragment_qr, container, false)
 
     val fab = activity?.findViewById<MaterialButton>(R.id.fab)
     fab?.visibility = View.INVISIBLE
+    val qrText = view.findViewById<EditText>(R.id.txtQr)
+    val qrImage = view.findViewById<ImageView>(R.id.imgQr)
+
+    if (!firebaseName.equals("")) {
+      qrText.setText(firebaseName)
+      disableEditText(qrText)
+      qrImage.setImageBitmap(createQrCode(firebaseName.toString()))
+    }
+
     bindTo(view)
     return view
+  }
+
+
+  fun createQrCode(text: String): Bitmap? {
+    val multiFormatWriter = MultiFormatWriter()
+    var bitmap: Bitmap? = null
+    try {
+      val bitMatrix = multiFormatWriter.encode(text, BarcodeFormat.QR_CODE, 250, 250)
+      val barcodeEncoder = BarcodeEncoder()
+      prefs[FIREBASE_UNIQUE_ID] = text
+      bitmap = barcodeEncoder.createBitmap(bitMatrix)
+
+      // doPhotoPrint(bitmap)
+
+    } catch (e: WriterException) {
+      e.printStackTrace()
+    }
+    return bitmap
+  }
+
+  private fun disableEditText(editText: EditText) {
+    editText.isFocusable = false
+    editText.isEnabled = false
+    editText.isCursorVisible = false
+    editText.keyListener = null
+    editText.setBackgroundColor(Color.TRANSPARENT)
   }
 
 
   fun bindTo(view: View) {
     val qrText = view.findViewById<EditText>(R.id.txtQr)
     val qrImage = view.findViewById<ImageView>(R.id.imgQr)
-    val qrMaterialButton = view.findViewById<MaterialButton>(R.id.mtrlBtnQr)
-    val qrShare = view.findViewById<MaterialButton>(R.id.mtrlBtnShare)
-    lateinit var bitmap: Bitmap
+    val qrMaterialButton = view.findViewById<MaterialButton>(
+        R.id.mtrlBtnQr)
+    val qrShare = view.findViewById<MaterialButton>(
+        R.id.mtrlBtnShare)
 
     qrMaterialButton.setOnClickListener {
       val text = qrText.text.toString()
-      val multiFormatWriter = MultiFormatWriter()
-      try {
-        val bitMatrix = multiFormatWriter.encode(text, BarcodeFormat.QR_CODE, 250, 250)
-        val barcodeEncoder = BarcodeEncoder()
-        bitmap = barcodeEncoder.createBitmap(bitMatrix)
-        qrImage.setImageBitmap(bitmap)
-        // doPhotoPrint(bitmap)
-
-      } catch (e: WriterException) {
-        e.printStackTrace()
-      }
+      var bitmap: Bitmap?
+      bitmap = createQrCode(text)
+      qrImage.setImageBitmap(bitmap)
     }
 
     qrShare.setOnClickListener {
-      val uri = saveImage(bitmap)
-      val shareIntent: Intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_STREAM, uri)
-        type = "image/png"
+      val text = qrText.text.toString()
+      val bitmap: Bitmap? = createQrCode(text)
+      qrImage.setImageBitmap(bitmap)
+      bitmap?.let {
+        val uri = saveImage(bitmap)
+        val shareIntent: Intent = Intent().apply {
+          action = Intent.ACTION_SEND
+          putExtra(Intent.EXTRA_STREAM, uri)
+          type = "image/png"
+        }
+        startActivity(Intent.createChooser(shareIntent, "Share QRCode"))
       }
-      startActivity(Intent.createChooser(shareIntent, "Share QRCode"))
     }
   }
 
@@ -131,40 +179,6 @@ class QRFragment : Fragment() {
 
     return uri
   }
-  // TODO: Rename method, update argument and hook method into UI event
-//  fun onButtonPressed(uri: Uri) {
-//    listener?.onFragmentInteraction(uri)
-//  }
-
-//  override fun onAttach(context: Context) {
-//    super.onAttach(context)
-//    if (context is OnFragmentInteractionListener) {
-//      listener = context
-//    } else {
-//      throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-//    }
-//  }
-
-//  override fun onDetach() {
-//    super.onDetach()
-//    listener = null
-//  }
-
-  /**
-   * This interface must be implemented by activities that contain this
-   * fragment to allow an interaction in this fragment to be communicated
-   * to the activity and potentially other fragments contained in that
-   * activity.
-   *
-   *
-   * See the Android Training lesson [Communicating with Other Fragments]
-   * (http://developer.android.com/training/basics/fragments/communicating.html)
-   * for more information.
-   */
-//  interface OnFragmentInteractionListener {
-//    // TODO: Update argument type and name
-//    fun onFragmentInteraction(uri: Uri)
-//  }
 
   companion object {
     /**

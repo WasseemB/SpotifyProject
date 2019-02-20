@@ -1,14 +1,14 @@
-package com.wasseemb.musicplayersample
+package com.wasseemb.musicplayersample.Fragments
 
 import android.os.Bundle
-import android.support.design.button.MaterialButton
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -16,6 +16,10 @@ import com.google.firebase.database.ValueEventListener
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
+import com.wasseemb.musicplayersample.Repositories.DummySwipeRepository
+import com.wasseemb.musicplayersample.R
+import com.wasseemb.musicplayersample.R.color
+import com.wasseemb.musicplayersample.R.drawable
 import com.wasseemb.musicplayersample.R.layout
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter
 import com.wasseemb.musicplayersample.Utils.CLIENT_ID
@@ -55,9 +59,9 @@ class FirebaseTrackFragment : Fragment() {
 
 
   val covertConfig = Covert.Config(
-      iconRes = R.drawable.ic_baseline_arrow_upward, // The icon to show
-      iconDefaultColorRes = R.color.white,            // The color of the icon
-      actionColorRes = R.color.colorPrimary           // The color of the background
+      iconRes = drawable.ic_baseline_arrow_upward, // The icon to show
+      iconDefaultColorRes = color.white,            // The color of the icon
+      actionColorRes = color.colorPrimary           // The color of the background
   )
 
   //private var listener: OnFragmentInteractionListener? = null
@@ -77,7 +81,8 @@ class FirebaseTrackFragment : Fragment() {
     setupRecyclerView(rootView)
     getTracksFromFirebase()
 
-    materialButton = activity!!.findViewById<MaterialButton>(R.id.fab)
+    materialButton = activity!!.findViewById<MaterialButton>(
+        R.id.fab)
     materialButton.text = "Play firebase playlist"
     materialButton.setOnClickListener {
       playTracks(param2!!)
@@ -142,7 +147,8 @@ class FirebaseTrackFragment : Fragment() {
         }
         .attachTo(recyclerView)
 
-    recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+    recyclerView.layoutManager = LinearLayoutManager(context,
+        RecyclerView.VERTICAL, false)
     trackAdapter = FirebaseTrackAdapter(covert)
     recyclerView.adapter = trackAdapter
   }
@@ -196,41 +202,6 @@ class FirebaseTrackFragment : Fragment() {
           }
         }
   }
-
-  // TODO: Rename method, update argument and hook method into UI event
-//  fun onButtonPressed(uri: Uri) {
-//    listener?.onFragmentInteraction(uri)
-//  }
-//
-//  override fun onAttach(context: Context) {
-//    super.onAttach(context)
-//    if (context is OnFragmentInteractionListener) {
-//      listener = context
-//    } else {
-//      throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-//    }
-//  }
-//
-//  override fun onDetach() {
-//    super.onDetach()
-//    listener = null
-//  }
-
-  /**
-   * This interface must be implemented by activities that contain this
-   * fragment to allow an interaction in this fragment to be communicated
-   * to the activity and potentially other fragments contained in that
-   * activity.
-   *
-   *
-   * See the Android Training lesson [Communicating with Other Fragments]
-   * (http://developer.android.com/training/basics/fragments/communicating.html)
-   * for more information.
-   */
-//  interface OnFragmentInteractionListener {
-//    // TODO: Update argument type and name
-//    fun onFragmentInteraction(uri: Uri)
-//  }
 
   companion object {
     /**

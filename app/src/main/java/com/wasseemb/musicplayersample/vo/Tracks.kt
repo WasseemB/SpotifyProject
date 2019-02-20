@@ -2,7 +2,6 @@ package com.wasseemb.musicplayersample.vo
 
 import com.squareup.moshi.Json
 
-
 data class Tracks(
     @Json(name = "href") val href: String,
     @Json(name = "items") val items: List<Item>,

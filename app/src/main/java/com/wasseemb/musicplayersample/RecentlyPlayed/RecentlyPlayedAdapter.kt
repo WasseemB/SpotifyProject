@@ -1,11 +1,11 @@
 package com.wasseemb.musicplayersample.RecentlyPlayed
 
-import android.support.v7.recyclerview.extensions.ListAdapter
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.wasseemb.musicplayersample.Extensions.inflate
 import com.wasseemb.musicplayersample.R.id
 import com.wasseemb.musicplayersample.R.layout

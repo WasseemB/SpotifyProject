@@ -1,6 +1,6 @@
 package com.wasseemb.musicplayersample.Track
 
-import android.support.v7.util.DiffUtil
+import androidx.recyclerview.widget.DiffUtil
 import com.wasseemb.musicplayersample.vo.Tracks
 
 class TrackCallBack : DiffUtil.ItemCallback<Tracks.Item>() {

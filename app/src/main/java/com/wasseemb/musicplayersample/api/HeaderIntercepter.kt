@@ -1,4 +1,4 @@
-package com.wasseemb.musicplayersample.vo
+package com.wasseemb.musicplayersample.api
 
 import okhttp3.Interceptor
 import okhttp3.Response

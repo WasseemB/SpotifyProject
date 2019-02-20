@@ -1,31 +1,36 @@
-package com.wasseemb.musicplayersample
+package com.wasseemb.musicplayersample.Fragments
 
 import android.os.Bundle
-import android.support.design.button.MaterialButton
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.wasseemb.musicplayersample.Extensions.uploadToFirebase
+import com.wasseemb.musicplayersample.R
+import com.wasseemb.musicplayersample.R.drawable
 import com.wasseemb.musicplayersample.R.layout
+import com.wasseemb.musicplayersample.SpotifyRepository
+import com.wasseemb.musicplayersample.SpotifyViewModel
+import com.wasseemb.musicplayersample.SpotifyViewModelFactory
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter
-import com.wasseemb.musicplayersample.Track.TrackAdapter
 import com.wasseemb.musicplayersample.Track.TrackAdapter.ItemClickListener
 import com.wasseemb.musicplayersample.Utils.CLIENT_ID
+import com.wasseemb.musicplayersample.Utils.Helper
 import com.wasseemb.musicplayersample.Utils.REDIRECT_URI
-import com.wasseemb.musicplayersample.api.SpotifyApiService
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
 import com.wasseemb.musicplayersample.vo.Tracks.Item
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -44,20 +49,25 @@ private var mSpotifyAppRemote: SpotifyAppRemote? = null
  *
  */
 class TrackFragment : Fragment(), ItemClickListener {
+
   // TODO: Rename and change types of parameters
-  private var token: String? = null
+  //private var token: String? = null
   //private var listener: OnFragmentInteractionListener? = null
   //private var simpleTrackArray = ArrayList<FirebaseTrack>()
   private lateinit var songHashMap: HashMap<String, FirebaseTrack>
   lateinit var recyclerView: RecyclerView
-  lateinit var trackAdapter: TrackAdapter
+  lateinit var trackAdapter: FirebaseTrackAdapter
+  lateinit var spotifyRepository: SpotifyRepository
+
+  val firebaseTracks = MutableLiveData<List<FirebaseTrack>>()
+
+  private lateinit var viewModelFactory: ViewModelProvider.Factory
+  private lateinit var spotifyViewModel: SpotifyViewModel
 
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    arguments?.let {
-      token = it.getString(ARG_PARAM1)
-    }
+    //firebaseTracks.value = spotifyRepository.getSpotifyTracks().value
   }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -66,11 +76,13 @@ class TrackFragment : Fragment(), ItemClickListener {
     val rootView = inflater.inflate(layout.trackitemdata_list, container, false)
     val fab = activity?.findViewById<MaterialButton>(R.id.fab)
     fab?.text = "Upload to firebase"
-    fab?.icon = ContextCompat.getDrawable(context!!, R.drawable.ic_upload)
+    fab?.icon = ContextCompat.getDrawable(context!!,
+        drawable.ic_upload)
     fab?.setOnClickListener {
       uploadToFirebase(songHashMap)
-      //Log.d("SimpleTrackArray", simpleTrackArray.toString())
     }
+    viewModelFactory = SpotifyViewModelFactory(spotifyRepository)
+    spotifyViewModel = ViewModelProviders.of(this, viewModelFactory)[SpotifyViewModel::class.java]
     setupRecyclerView(rootView)
     getTracks()
     return rootView
@@ -126,40 +138,30 @@ class TrackFragment : Fragment(), ItemClickListener {
 
   private fun setupRecyclerView(view: View) {
     recyclerView = view.findViewById(R.id.trackitemdata_list)
-    recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-    trackAdapter = TrackAdapter()
-    trackAdapter.itemClickListener = this
+    recyclerView.layoutManager = LinearLayoutManager(context,
+        RecyclerView.VERTICAL, false)
+    trackAdapter = FirebaseTrackAdapter()
+    // trackAdapter.itemClickListener = this
     recyclerView.adapter = trackAdapter
   }
 
+
   private fun getTracks() {
-    songHashMap = HashMap()
-    token?.let {
-      SpotifyApiService.create(it).getUserTracks().observeOn(
-          AndroidSchedulers.mainThread())
-          .subscribeOn(Schedulers.io())
-          //Retain orignal value of the stream before sideeffects
-          .flatMap({ tracks ->
-            Observable.fromIterable(tracks.items)
-          }, { tracks, item -> Pair(tracks, item) })
-          .subscribe { result ->
-            songHashMap[result.second.track.uri] = FirebaseTrack(
-                artist = result.second.track.artists[0].name, name = result.second.track.name,
-                uri = result.second.track.uri,
-                albumImageUrl = result.second.track.album.images[0].url)
-            trackAdapter.submitList(result.first.items)
-          }
-    }
+    spotifyViewModel.loadTracks()
+    spotifyViewModel.getLocalTracks().observe(viewLifecycleOwner,
+        Observer<List<FirebaseTrack>> {
+          trackAdapter.submitList(it)
+          songHashMap = Helper().hashMapFromFirebaseTrack(it)
+        })
+
   }
 
 
   companion object {
     @JvmStatic
-    fun newInstance(token: String) =
+    fun newInstance(spotifyRepository: SpotifyRepository) =
         TrackFragment().apply {
-          arguments = Bundle().apply {
-            putString(ARG_PARAM1, token)
-          }
+          this.spotifyRepository = spotifyRepository
         }
   }
 }

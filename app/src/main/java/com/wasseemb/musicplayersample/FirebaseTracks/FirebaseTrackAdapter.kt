@@ -1,7 +1,7 @@
 package com.wasseemb.musicplayersample.Track
 
-import android.support.v7.recyclerview.extensions.ListAdapter
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -15,7 +15,8 @@ import com.wasseemb.musicplayersample.vo.FirebaseTrack
 import nz.co.trademe.covert.Covert
 
 
-class FirebaseTrackAdapter(private val covert: Covert) : ListAdapter<FirebaseTrack, ListViewHolder>(
+class FirebaseTrackAdapter(
+    private val covert: Covert? = null) : ListAdapter<FirebaseTrack, ListViewHolder>(
     FirebaseTrackCallBack()) {
 
 
@@ -33,7 +34,7 @@ class FirebaseTrackAdapter(private val covert: Covert) : ListAdapter<FirebaseTra
   }
 
   override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
-    covert.drawCornerFlag(holder)
+    covert?.drawCornerFlag(holder)
     holder.bindTo(getItem(position)!!)
   }
 
