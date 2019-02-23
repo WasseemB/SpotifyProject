@@ -18,12 +18,12 @@ import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.wasseemb.musicplayersample.Extensions.uploadToFirebase
+import com.wasseemb.musicplayersample.MusicPlayerSampleApplication
 import com.wasseemb.musicplayersample.R
 import com.wasseemb.musicplayersample.R.drawable
 import com.wasseemb.musicplayersample.R.layout
 import com.wasseemb.musicplayersample.SpotifyRepository
 import com.wasseemb.musicplayersample.SpotifyViewModel
-import com.wasseemb.musicplayersample.SpotifyViewModelFactory
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter
 import com.wasseemb.musicplayersample.Track.TrackAdapter.ItemClickListener
 import com.wasseemb.musicplayersample.Utils.CLIENT_ID
@@ -61,7 +61,7 @@ class TrackFragment : Fragment(), ItemClickListener {
 
   val firebaseTracks = MutableLiveData<List<FirebaseTrack>>()
 
-  private lateinit var viewModelFactory: ViewModelProvider.Factory
+  lateinit var viewModelFactory: ViewModelProvider.Factory
   private lateinit var spotifyViewModel: SpotifyViewModel
 
 
@@ -81,12 +81,17 @@ class TrackFragment : Fragment(), ItemClickListener {
     fab?.setOnClickListener {
       uploadToFirebase(songHashMap)
     }
-    viewModelFactory = SpotifyViewModelFactory(spotifyRepository)
+    //viewModelFactory = SpotifyViewModelFactory(spotifyRepository)
+    val appComponent = activity?.application as MusicPlayerSampleApplication
+
+    viewModelFactory = appComponent.component.getViewModelFactory()
+
     spotifyViewModel = ViewModelProviders.of(this, viewModelFactory)[SpotifyViewModel::class.java]
     setupRecyclerView(rootView)
     getTracks()
     return rootView
   }
+
 
   override fun onItemClick(item: Item) {
     val connectionParams = ConnectionParams.Builder(CLIENT_ID)

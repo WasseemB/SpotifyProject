@@ -1,6 +1,5 @@
 package com.wasseemb.musicplayersample
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -14,11 +13,10 @@ import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.room.Room
 import com.google.android.material.navigation.NavigationView
 import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationResponse
-import com.wasseemb.musicplayersample.Database.FirebaseTracksDatabase
+import com.wasseemb.musicplayersample.Database.FirebaseTrackDao
 import com.wasseemb.musicplayersample.Fragments.FirebaseTrackFragment
 import com.wasseemb.musicplayersample.Fragments.QRFragment
 import com.wasseemb.musicplayersample.Fragments.QRReaderFragment
@@ -26,9 +24,11 @@ import com.wasseemb.musicplayersample.Fragments.RecentlyPlayedFragment
 import com.wasseemb.musicplayersample.Fragments.TrackFragment
 import com.wasseemb.musicplayersample.Utils.REQUEST_CODE
 import com.wasseemb.musicplayersample.Utils.SpotifyHelper
+import com.wasseemb.musicplayersample.api.HeaderInterceptor
 import com.wasseemb.musicplayersample.api.SpotifyApiService
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.wasseemb.musicplayersample.dagger.DaggerApplicationComponent
+import com.wasseemb.musicplayersample.dagger.HeaderInterceptorModule
+import com.wasseemb.musicplayersample.dagger2.ContextModule
 import kotlinx.android.synthetic.main.activity_navigation.drawer_layout
 import kotlinx.android.synthetic.main.activity_navigation.nav_view
 import kotlinx.android.synthetic.main.app_bar_navigation.fab
@@ -38,11 +38,23 @@ import kotlinx.android.synthetic.main.app_bar_navigation.toolbar
 class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
 
-  private lateinit var authToken: String
-  private lateinit var playlistId: String
-  private lateinit var spotifyRepository: SpotifyRepository
-  private lateinit var viewModelFactory: ViewModelProvider.Factory
-  private lateinit var spotifyViewModel: SpotifyViewModel
+  lateinit var authToken: String
+  lateinit var playlistId: String
+
+  //@Inject
+  lateinit var spotifyRepository: SpotifyRepository
+  //  @Inject
+  lateinit var viewModelFactory: ViewModelProvider.Factory
+
+  //@Inject
+  lateinit var dao: FirebaseTrackDao
+
+  lateinit var interceptor: HeaderInterceptor
+
+  //@Inject
+  lateinit var spotifyApiService: SpotifyApiService
+
+  lateinit var spotifyViewModel: SpotifyViewModel
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -63,12 +75,24 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     toggle.syncState()
 
     nav_view.setNavigationItemSelectedListener(this)
+
   }
 
-  private fun setUpUserData(authToken: String) {
-    spotifyRepository = SpotifyRepository(SpotifyApiService.create(authToken),
-        provideDatabase(this).firebaseDao())
-    viewModelFactory = SpotifyViewModelFactory(spotifyRepository)
+  private fun setUpUserData(interceptor: HeaderInterceptor) {
+
+    val appComponent = application as MusicPlayerSampleApplication
+    appComponent.component = DaggerApplicationComponent.builder().contextModule(
+        ContextModule(this)).headerInterceptorModule(
+        HeaderInterceptorModule(interceptor)).build()
+//    val component = DaggerApplicationComponent.builder().contextModule(
+//        ContextModule(this)).headerInterceptorModule(
+//        HeaderInterceptorModule(interceptor)).build()
+//    spotifyApiService = retrofit(intercepter)
+//    spotifyRepository = SpotifyRepository(spotifyApiService,
+//        dao)
+    spotifyRepository = appComponent.component.getSpotifyRepository()
+    //viewModelFactory = SpotifyViewModelFactory(spotifyRepository)
+    viewModelFactory = appComponent.component.getViewModelFactory()
     spotifyViewModel = ViewModelProviders.of(this, viewModelFactory).get(
         SpotifyViewModel::class.java)
 
@@ -84,16 +108,16 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
   }
 
-  private fun createPlayList(authToken: String, userId: String) {
-    val body = HashMap<String, String>()
-    body["name"] = "Temp"
-    SpotifyApiService.create(authToken).createPlayList(userId, body).observeOn(
-        AndroidSchedulers.mainThread())
-        .subscribeOn(Schedulers.io()).subscribe {
-          Log.d("CreatePlaylist", it.id)
-          playlistId = it.id
-        }
-  }
+//  private fun createPlayList(authToken: String, userId: String) {
+//    val body = HashMap<String, String>()
+//    body["name"] = "Temp"
+//    SpotifyApiService.create(authToken).createPlayList(userId, body).observeOn(
+//        AndroidSchedulers.mainThread())
+//        .subscribeOn(Schedulers.io()).subscribe {
+//          Log.d("CreatePlaylist", it.id)
+//          playlistId = it.id
+//        }
+//  }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
     super.onActivityResult(requestCode, resultCode, intent)
@@ -105,7 +129,8 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
       when (response.type) {
         AuthenticationResponse.Type.TOKEN -> {
           authToken = response.accessToken
-          setUpUserData(authToken)
+          interceptor = HeaderInterceptor(authToken)
+          setUpUserData(interceptor)
           setUpFragment()
 
         }
@@ -179,12 +204,26 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     return true
   }
 
-  fun provideDatabase(context: Context): FirebaseTracksDatabase {
 
-    return Room.databaseBuilder(context, FirebaseTracksDatabase::class.java,
-        "firebasetrackdb.db").build()
-
-  }
-
+//  fun retrofit(intercepter
+//  : HeaderInterceptor): SpotifyApiService {
+//    val API_URL = "https://api.spotify.com/v1/"
+//
+//    val logging = HttpLoggingInterceptor()
+//    logging.level = HttpLoggingInterceptor.Level.BODY
+//    val httpClient = OkHttpClient.Builder()
+//    httpClient.addInterceptor(intercepter)
+//    //httpClient.addInterceptor(logging)
+//
+//
+//    val retrofit = Retrofit.Builder()
+//        .addConverterFactory(
+//            MoshiConverterFactory.create())
+//        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+//        .baseUrl(API_URL)
+//        .client(httpClient.build())
+//        .build()
+//    return retrofit.create(SpotifyApiService::class.java)
+//  }
 
 }

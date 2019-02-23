@@ -31,7 +31,7 @@ dependencies {
 
 
   implementation 'com.google.dagger:dagger:2.21'
-  annotationProcessor 'com.google.dagger:dagger-compiler:2.21'
+  kapt 'com.google.dagger:dagger-compiler:2.21'
 
   implementation 'androidx.core:core-ktx:1.1.0-alpha04'
   implementation 'androidx.appcompat:appcompat:1.1.0-alpha02'

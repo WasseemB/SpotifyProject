@@ -7,12 +7,7 @@ import com.wasseemb.musicplayersample.vo.Tracks.Item.Track
 import com.wasseemb.musicplayersample.vo.UserResponse
 import io.reactivex.Observable
 import io.reactivex.Single
-import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -48,26 +43,4 @@ interface SpotifyApiService {
   @POST("playlists/{playlist_id}/tracks")
   fun addTracksToPlaylist(@Path(
       "playlist_id") userId: String, @Body body: Map<String, List<String>>): Observable<ResponseBody>
-
-  companion object {
-    private const val API_URL = "https://api.spotify.com/v1/"
-    fun create(token: String): SpotifyApiService {
-      val logging = HttpLoggingInterceptor()
-      logging.level = HttpLoggingInterceptor.Level.BODY
-      val httpClient = OkHttpClient.Builder()
-      httpClient.addInterceptor(HeaderInterceptor(token = token))
-      //httpClient.addInterceptor(logging)
-
-
-      val retrofit = Retrofit.Builder()
-          .addConverterFactory(
-              MoshiConverterFactory.create())
-          .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-          .baseUrl(API_URL)
-          .client(httpClient.build())
-          .build()
-      return retrofit.create(SpotifyApiService::class.java)
-    }
-  }
-
 }

@@ -105,7 +105,7 @@ class FirebaseTrackFragment : Fragment() {
         }
         val body = HashMap<String, ArrayList<String>>()
         body["uris"] = uriArray
-        addTracksToPlaylist(body)
+        //addTracksToPlaylist(body)
         trackAdapter.submitList(simpleTrackArray)
       }
 
@@ -117,11 +117,11 @@ class FirebaseTrackFragment : Fragment() {
 
   }
 
-  private fun addTracksToPlaylist(body: HashMap<String, ArrayList<String>>) {
-    SpotifyApiService.create(param1!!).addTracksToPlaylist(param2!!, body).observeOn(
-        AndroidSchedulers.mainThread())
-        .subscribeOn(Schedulers.io()).subscribe()
-  }
+//  private fun addTracksToPlaylist(body: HashMap<String, ArrayList<String>>) {
+//    SpotifyApiService.create(param1!!).addTracksToPlaylist(param2!!, body).observeOn(
+//        AndroidSchedulers.mainThread())
+//        .subscribeOn(Schedulers.io()).subscribe()
+//  }
 
   private fun setupRecyclerView(view: View) {
     recyclerView = view.findViewById(R.id.firebase_list)
