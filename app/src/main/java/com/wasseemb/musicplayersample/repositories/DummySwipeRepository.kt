@@ -1,4 +1,4 @@
-package com.wasseemb.musicplayersample.Repositories
+package com.wasseemb.musicplayersample.repositories
 
 class DummySwipeRepository {
 

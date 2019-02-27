@@ -6,6 +6,7 @@
     android:name="com.wasseemb.musicplayersample.FirebaseTrackFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
     tools:listitem="@layout/firebase_list_content"
     />

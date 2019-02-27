@@ -1,4 +1,4 @@
-package com.wasseemb.musicplayersample.Fragments
+package com.wasseemb.musicplayersample.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager

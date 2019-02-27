@@ -15,8 +15,6 @@ class MusicPlayerSampleApplication : Application() {
 
   override fun onCreate() {
     super.onCreate()
-//    applicationComponent = DaggerApplicationComponent.builder().applicationModule(
-//        ApplicationModule(this)).networkModule(NetworkModule(null)) .build()
     component = DaggerApplicationComponent.builder().contextModule(
         ContextModule(this)).headerInterceptorModule(
         HeaderInterceptorModule(HeaderInterceptor(""))).build()

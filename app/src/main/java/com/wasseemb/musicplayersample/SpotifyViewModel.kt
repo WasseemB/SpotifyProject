@@ -8,18 +8,20 @@ import javax.inject.Inject
 class SpotifyViewModel @Inject constructor(
     private val spotifyRepository: SpotifyRepository) : ViewModel() {
 
-  var displayableTrack: LiveData<List<FirebaseTrack>>
+  var displayableTrack: LiveData<List<FirebaseTrack>> = spotifyRepository.getSpotifyTracks()
+  var displayableRecent: LiveData<List<FirebaseTrack>> = spotifyRepository.getSpotifyRecents()
 
-
-  init {
-    displayableTrack = spotifyRepository.getSpotifyTracks()
-  }
 
   fun getLocalTracks(): LiveData<List<FirebaseTrack>> = displayableTrack
+  fun getLocalRecents(): LiveData<List<FirebaseTrack>> = displayableRecent
 
 
   fun loadTracks() {
     spotifyRepository.getRemoteTracks()
+  }
+
+  fun loadRecents() {
+    spotifyRepository.getRemoteRecentlyPlayed()
   }
 
 

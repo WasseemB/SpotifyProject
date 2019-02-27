@@ -1,4 +1,4 @@
-package com.wasseemb.musicplayersample.Utils
+package com.wasseemb.musicplayersample.utils
 
 import android.app.Activity
 import android.content.Context
@@ -9,7 +9,7 @@ import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationRequest
 import com.spotify.sdk.android.authentication.AuthenticationResponse
-import com.wasseemb.musicplayersample.vo.RecentlyPlayed
+import com.wasseemb.musicplayersample.vo.FirebaseTrack
 
 class SpotifyHelper {
   fun createAuthRequest(activty: Activity) {
@@ -29,7 +29,7 @@ class SpotifyHelper {
   }
 
 
-  fun playTrack(item: RecentlyPlayed.Item, context: Context?): SpotifyAppRemote? {
+  fun playTrack(item: FirebaseTrack, context: Context?): SpotifyAppRemote? {
     var spotifyAppRemoter: SpotifyAppRemote? = null
     val connectionParams = ConnectionParams.Builder(CLIENT_ID)
         .setRedirectUri(REDIRECT_URI)
@@ -55,9 +55,9 @@ class SpotifyHelper {
     return spotifyAppRemoter
   }
 
-  private fun connected(item: RecentlyPlayed.Item, spotifyAppRemote: SpotifyAppRemote?) {
+  private fun connected(item: FirebaseTrack, spotifyAppRemote: SpotifyAppRemote?) {
     // Play a playlist
-    spotifyAppRemote?.playerApi?.play(item.track.uri)
+    spotifyAppRemote?.playerApi?.play(item.uri)
 
 
     // Subscribe to PlayerState

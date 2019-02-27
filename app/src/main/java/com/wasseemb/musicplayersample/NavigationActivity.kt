@@ -16,23 +16,22 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.navigation.NavigationView
 import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationResponse
-import com.wasseemb.musicplayersample.Database.FirebaseTrackDao
-import com.wasseemb.musicplayersample.Fragments.FirebaseTrackFragment
-import com.wasseemb.musicplayersample.Fragments.QRFragment
-import com.wasseemb.musicplayersample.Fragments.QRReaderFragment
-import com.wasseemb.musicplayersample.Fragments.RecentlyPlayedFragment
-import com.wasseemb.musicplayersample.Fragments.TrackFragment
-import com.wasseemb.musicplayersample.Utils.REQUEST_CODE
-import com.wasseemb.musicplayersample.Utils.SpotifyHelper
 import com.wasseemb.musicplayersample.api.HeaderInterceptor
-import com.wasseemb.musicplayersample.api.SpotifyApiService
 import com.wasseemb.musicplayersample.dagger.DaggerApplicationComponent
 import com.wasseemb.musicplayersample.dagger.HeaderInterceptorModule
 import com.wasseemb.musicplayersample.dagger2.ContextModule
+import com.wasseemb.musicplayersample.fragments.FirebaseTrackFragment
+import com.wasseemb.musicplayersample.fragments.QRFragment
+import com.wasseemb.musicplayersample.fragments.QRReaderFragment
+import com.wasseemb.musicplayersample.fragments.RecentlyPlayedFragment
+import com.wasseemb.musicplayersample.fragments.TrackFragment
+import com.wasseemb.musicplayersample.utils.REQUEST_CODE
+import com.wasseemb.musicplayersample.utils.SpotifyHelper
 import kotlinx.android.synthetic.main.activity_navigation.drawer_layout
 import kotlinx.android.synthetic.main.activity_navigation.nav_view
 import kotlinx.android.synthetic.main.app_bar_navigation.fab
 import kotlinx.android.synthetic.main.app_bar_navigation.toolbar
+import javax.inject.Inject
 
 
 class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -41,18 +40,12 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
   lateinit var authToken: String
   lateinit var playlistId: String
 
-  //@Inject
+  @Inject
   lateinit var spotifyRepository: SpotifyRepository
-  //  @Inject
+  @Inject
   lateinit var viewModelFactory: ViewModelProvider.Factory
 
-  //@Inject
-  lateinit var dao: FirebaseTrackDao
-
   lateinit var interceptor: HeaderInterceptor
-
-  //@Inject
-  lateinit var spotifyApiService: SpotifyApiService
 
   lateinit var spotifyViewModel: SpotifyViewModel
 
@@ -60,6 +53,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_navigation)
     setSupportActionBar(toolbar)
+
 
     fab.text = "Connect to Spotify"
     fab.setOnClickListener {
@@ -84,15 +78,8 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     appComponent.component = DaggerApplicationComponent.builder().contextModule(
         ContextModule(this)).headerInterceptorModule(
         HeaderInterceptorModule(interceptor)).build()
-//    val component = DaggerApplicationComponent.builder().contextModule(
-//        ContextModule(this)).headerInterceptorModule(
-//        HeaderInterceptorModule(interceptor)).build()
-//    spotifyApiService = retrofit(intercepter)
-//    spotifyRepository = SpotifyRepository(spotifyApiService,
-//        dao)
-    spotifyRepository = appComponent.component.getSpotifyRepository()
-    //viewModelFactory = SpotifyViewModelFactory(spotifyRepository)
-    viewModelFactory = appComponent.component.getViewModelFactory()
+    appComponent.component.inject(this)
+
     spotifyViewModel = ViewModelProviders.of(this, viewModelFactory).get(
         SpotifyViewModel::class.java)
 
@@ -107,6 +94,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
   }
+
 
 //  private fun createPlayList(authToken: String, userId: String) {
 //    val body = HashMap<String, String>()
@@ -145,7 +133,7 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
   private fun setUpFragment() {
     val newFragment: Fragment
     val transaction = supportFragmentManager.beginTransaction()
-    newFragment = RecentlyPlayedFragment.newInstance(spotifyRepository)
+    newFragment = RecentlyPlayedFragment.newInstance()
     transaction.replace(R.id.content_data, newFragment)
     transaction.addToBackStack(null)
     transaction.commit()
@@ -181,10 +169,10 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     val transaction = supportFragmentManager.beginTransaction()
     when (item.itemId) {
       R.id.nav_recent -> {
-        newFragment = RecentlyPlayedFragment.newInstance(spotifyRepository)
+        newFragment = RecentlyPlayedFragment.newInstance()
       }
       R.id.nav_client -> {
-        newFragment = TrackFragment.newInstance(spotifyRepository)
+        newFragment = TrackFragment.newInstance()
       }
       R.id.nav_player -> {
         newFragment = FirebaseTrackFragment.newInstance(authToken, playlistId)
@@ -203,27 +191,4 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     drawer_layout.closeDrawer(GravityCompat.START)
     return true
   }
-
-
-//  fun retrofit(intercepter
-//  : HeaderInterceptor): SpotifyApiService {
-//    val API_URL = "https://api.spotify.com/v1/"
-//
-//    val logging = HttpLoggingInterceptor()
-//    logging.level = HttpLoggingInterceptor.Level.BODY
-//    val httpClient = OkHttpClient.Builder()
-//    httpClient.addInterceptor(intercepter)
-//    //httpClient.addInterceptor(logging)
-//
-//
-//    val retrofit = Retrofit.Builder()
-//        .addConverterFactory(
-//            MoshiConverterFactory.create())
-//        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-//        .baseUrl(API_URL)
-//        .client(httpClient.build())
-//        .build()
-//    return retrofit.create(SpotifyApiService::class.java)
-//  }
-
 }

@@ -1,4 +1,4 @@
-package com.wasseemb.musicplayersample.Database
+package com.wasseemb.musicplayersample.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

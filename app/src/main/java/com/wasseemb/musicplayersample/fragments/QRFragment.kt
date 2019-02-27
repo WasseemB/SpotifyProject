@@ -1,4 +1,4 @@
-package com.wasseemb.musicplayersample.Fragments
+package com.wasseemb.musicplayersample.fragments
 
 
 import android.content.ContentValues.TAG
@@ -22,12 +22,12 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.wasseemb.musicplayersample.Extensions.PreferenceHelper.defaultPrefs
-import com.wasseemb.musicplayersample.Extensions.PreferenceHelper.get
-import com.wasseemb.musicplayersample.Extensions.PreferenceHelper.set
+import com.wasseemb.musicplayersample.extensions.PreferenceHelper.defaultPrefs
+import com.wasseemb.musicplayersample.extensions.PreferenceHelper.get
+import com.wasseemb.musicplayersample.extensions.PreferenceHelper.set
 import com.wasseemb.musicplayersample.R
 import com.wasseemb.musicplayersample.R.layout
-import com.wasseemb.musicplayersample.Utils.FIREBASE_UNIQUE_ID
+import com.wasseemb.musicplayersample.utils.FIREBASE_UNIQUE_ID
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException

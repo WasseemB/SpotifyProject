@@ -9,15 +9,17 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 
-@Module
+@Module(includes = [NetworkModule::class])
 class SpotifyServiceModule {
 
   @Provides
+  @ApplicationScope
   fun spotifyService(retrofit: Retrofit): SpotifyApiService {
     return retrofit.create(SpotifyApiService::class.java)
   }
 
   @Provides
+  @ApplicationScope
   fun retrofit(okHttpClient: OkHttpClient): Retrofit {
     val API_URL = "https://api.spotify.com/v1/"
     return Retrofit.Builder()

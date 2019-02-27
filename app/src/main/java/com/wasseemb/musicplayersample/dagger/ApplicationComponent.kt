@@ -1,24 +1,31 @@
 package com.wasseemb.musicplayersample.dagger
 
 import androidx.lifecycle.ViewModelProvider
-import com.wasseemb.musicplayersample.Database.FirebaseTrackDao
+import com.wasseemb.musicplayersample.fragments.RecentlyPlayedFragment
+import com.wasseemb.musicplayersample.fragments.TrackFragment
+import com.wasseemb.musicplayersample.NavigationActivity
 import com.wasseemb.musicplayersample.SpotifyRepository
-import com.wasseemb.musicplayersample.api.SpotifyApiService
-import com.wasseemb.musicplayersample.dagger2.ContextModule
 import com.wasseemb.musicplayersample.dagger2.SpotifyViewModelFactoryModule
 import dagger.Component
 
 
+@ApplicationScope
 @Component(
-    modules = [SpotifyServiceModule::class, ApplicationModule::class, ContextModule::class,
-      NetworkModule::class, HeaderInterceptorModule::class, SpotifyViewModelFactoryModule::class])
+    modules = [ApplicationModule::class,
+      SpotifyViewModelFactoryModule::class])
 interface ApplicationComponent {
 
-  fun getSpotifyService(): SpotifyApiService
+
+  fun inject(trackFragment: TrackFragment)
+  fun inject(recentlyPlayedFragment: RecentlyPlayedFragment)
+
+  fun inject(navigationActivity: NavigationActivity)
+
+  //fun getSpotifyService(): SpotifyApiService
 
   fun getSpotifyRepository(): SpotifyRepository
 
-  fun getFirebaseDao(): FirebaseTrackDao
+  // fun getFirebaseDao(): FirebaseTrackDao
 
   fun getViewModelFactory(): ViewModelProvider.Factory
 }

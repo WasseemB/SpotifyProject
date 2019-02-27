@@ -8,6 +8,7 @@ import dagger.Provides
 class HeaderInterceptorModule(val interceptor: HeaderInterceptor) {
 
   @Provides
+  @ApplicationScope
   fun headerInterceptor(): HeaderInterceptor {
     return interceptor
   }

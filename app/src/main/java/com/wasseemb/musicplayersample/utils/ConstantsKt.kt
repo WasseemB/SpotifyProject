@@ -1,4 +1,4 @@
-package com.wasseemb.musicplayersample.Utils
+package com.wasseemb.musicplayersample.utils
 
 const val CLIENT_ID = "ecc6461c3b864854b9e15930e5720bd3"
 const val REDIRECT_URI = "com.wasseemb.musicplayersample://callback"

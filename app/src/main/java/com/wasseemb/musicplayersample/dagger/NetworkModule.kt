@@ -7,31 +7,20 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
 
-@Module
+@Module(includes = [HeaderInterceptorModule::class])
 class NetworkModule {
 
 
   @Provides
+  @ApplicationScope
   fun httpLoggingInterceptor(): HttpLoggingInterceptor {
     val logging = HttpLoggingInterceptor()
     logging.level = HttpLoggingInterceptor.Level.BODY
     return logging
   }
 
-//  @Provides
-//  fun headerInterceptor(token: String): Interceptor {
-//    val interceptor = Interceptor { chain ->
-//      chain.run {
-//        proceed(request().newBuilder()
-//            .addHeader("Authorization", "Bearer " + token)
-//            .build())
-//      }
-//    }
-//    return interceptor
-//
-//  }
-
   @Provides
+  @ApplicationScope
   fun okHttpClient(headerInterceptor: HeaderInterceptor): OkHttpClient {
     val httpClient = OkHttpClient.Builder()
     //httpClient.addInterceptor(logging)

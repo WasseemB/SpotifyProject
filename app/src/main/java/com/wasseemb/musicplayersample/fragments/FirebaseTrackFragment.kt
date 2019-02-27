@@ -1,4 +1,4 @@
-package com.wasseemb.musicplayersample.Fragments
+package com.wasseemb.musicplayersample.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -16,18 +16,15 @@ import com.google.firebase.database.ValueEventListener
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
-import com.wasseemb.musicplayersample.Repositories.DummySwipeRepository
+import com.wasseemb.musicplayersample.repositories.DummySwipeRepository
 import com.wasseemb.musicplayersample.R
 import com.wasseemb.musicplayersample.R.color
 import com.wasseemb.musicplayersample.R.drawable
 import com.wasseemb.musicplayersample.R.layout
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter
-import com.wasseemb.musicplayersample.Utils.CLIENT_ID
-import com.wasseemb.musicplayersample.Utils.REDIRECT_URI
-import com.wasseemb.musicplayersample.api.SpotifyApiService
+import com.wasseemb.musicplayersample.utils.CLIENT_ID
+import com.wasseemb.musicplayersample.utils.REDIRECT_URI
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import nz.co.trademe.covert.Covert
 
 

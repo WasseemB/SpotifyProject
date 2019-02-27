@@ -2,8 +2,8 @@ package com.wasseemb.musicplayersample.api
 
 import com.wasseemb.musicplayersample.vo.Playlists
 import com.wasseemb.musicplayersample.vo.RecentlyPlayed
+import com.wasseemb.musicplayersample.vo.SingleTrack
 import com.wasseemb.musicplayersample.vo.Tracks
-import com.wasseemb.musicplayersample.vo.Tracks.Item.Track
 import com.wasseemb.musicplayersample.vo.UserResponse
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -26,7 +26,7 @@ interface SpotifyApiService {
 
   @GET("tracks/{id}")
   fun getTrack(@Path("id") id: String)
-      : Observable<Track>
+      : Observable<SingleTrack>
 
   @GET("me")
   fun getUserData(): Single<UserResponse>

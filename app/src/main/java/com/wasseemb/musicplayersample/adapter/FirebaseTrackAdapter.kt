@@ -1,16 +1,16 @@
 package com.wasseemb.musicplayersample.Track
 
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.wasseemb.musicplayersample.Extensions.inflate
-import com.wasseemb.musicplayersample.Extensions.loadUrl
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.wasseemb.musicplayersample.R.id
 import com.wasseemb.musicplayersample.R.layout
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter.ListViewHolder
+import com.wasseemb.musicplayersample.extensions.inflate
+import com.wasseemb.musicplayersample.extensions.loadUrl
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
 import nz.co.trademe.covert.Covert
 
@@ -18,18 +18,23 @@ import nz.co.trademe.covert.Covert
 class FirebaseTrackAdapter(
     private val covert: Covert? = null) : ListAdapter<FirebaseTrack, ListViewHolder>(
     FirebaseTrackCallBack()) {
+  lateinit var itemClickListener: DisplayableTrackClickListener
 
+
+  interface DisplayableTrackClickListener {
+    fun onItemClick(item: FirebaseTrack)
+  }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewtype: Int): ListViewHolder {
 
     val viewHolder = ListViewHolder(parent.inflate(
         layout.firebase_list_content))
-    //viewHolder.itemView.setOnClickListener {
-    //val position = viewHolder.adapterPosition
-    //if (position != RecyclerView.NO_POSITION)
-    //getItem given by implementing ListAdapter(Support Library)
-    //itemClickListener.onItemClick(getItem(position)!!)
-    //}
+    viewHolder.itemView.setOnClickListener {
+      val position = viewHolder.adapterPosition
+      if (position != RecyclerView.NO_POSITION)
+      //getItem given by implementing ListAdapter(Support Library)
+        itemClickListener.onItemClick(getItem(position)!!)
+    }
     return viewHolder
   }
 

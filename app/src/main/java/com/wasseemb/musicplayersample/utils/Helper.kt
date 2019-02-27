@@ -1,4 +1,4 @@
-package com.wasseemb.musicplayersample.Utils
+package com.wasseemb.musicplayersample.utils
 
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
 import com.wasseemb.musicplayersample.vo.RecentlyPlayed.Item
