@@ -9,11 +9,15 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.google.android.material.button.MaterialButton
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.Transaction
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.wasseemb.musicplayersample.MusicPlayerSampleApplication
 import com.wasseemb.musicplayersample.R
@@ -22,6 +26,7 @@ import com.wasseemb.musicplayersample.R.layout
 import com.wasseemb.musicplayersample.SpotifyViewModel
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter.DisplayableTrackClickListener
+import com.wasseemb.musicplayersample.extensions.uploadToFirebase
 import com.wasseemb.musicplayersample.utils.Helper
 import com.wasseemb.musicplayersample.utils.SpotifyHelper
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
@@ -34,14 +39,15 @@ class RecentlyPlayedFragment : Fragment(), DisplayableTrackClickListener {
   }
 
   private lateinit var trackAdapter: FirebaseTrackAdapter
-
-  private lateinit var songHashMap: HashMap<String, FirebaseTrack>
   private var spotifyAppRemote: SpotifyAppRemote? = null
 
   @Inject
-  lateinit var viewModelFactory: ViewModelProvider.Factory
-  private lateinit var spotifyViewModel: SpotifyViewModel
+  lateinit var spotifyViewModel: SpotifyViewModel
 
+
+  @Inject
+  lateinit var databaseReference: DatabaseReference
+  private var uriArray = ArrayList<String>()
 
   val firebaseRecents = MutableLiveData<List<FirebaseTrack>>()
 
@@ -56,9 +62,13 @@ class RecentlyPlayedFragment : Fragment(), DisplayableTrackClickListener {
     fab?.text = "Upload to firebase"
     fab?.icon = ContextCompat.getDrawable(context!!,
         drawable.ic_upload)
-    //fab?.setOnClickListener { uploadToFirebase(songHashMap) }
-    spotifyViewModel = ViewModelProviders.of(this, viewModelFactory)[SpotifyViewModel::class.java]
-    firebaseRecents.value = spotifyViewModel.displayableRecent.value
+    fab?.setOnClickListener {
+      uploadWithHandlingDuplicates()
+      // songHashMap = Helper().hashMapFromFirebaseTrack(firebaseRecents.value!!)
+      //uploadToFirebase(songHashMap)
+    }
+    //spotifyViewModel = ViewModelProviders.of(this, viewModelFactory)[SpotifyViewModel::class.java]
+    firebaseRecents.value = spotifyViewModel.displayableAll.value
     setupRecyclerView(rootView)
     getRecentlyPlayed()
     return rootView
@@ -80,7 +90,7 @@ class RecentlyPlayedFragment : Fragment(), DisplayableTrackClickListener {
   private fun setupRecyclerView(view: View) {
     val recyclerView = view.findViewById<RecyclerView>(R.id.trackitemdata_list)
     recyclerView.layoutManager = LinearLayoutManager(context,
-        RecyclerView.VERTICAL, false)
+        RecyclerView.VERTICAL, false) as LayoutManager?
     trackAdapter = FirebaseTrackAdapter()
     trackAdapter.itemClickListener = this
     recyclerView.adapter = trackAdapter
@@ -89,12 +99,48 @@ class RecentlyPlayedFragment : Fragment(), DisplayableTrackClickListener {
 
   private fun getRecentlyPlayed() {
     spotifyViewModel.loadRecents()
-    spotifyViewModel.getLocalRecents().observe(viewLifecycleOwner,
+    spotifyViewModel.loadTracks()
+
+    spotifyViewModel.getLocal().observe(viewLifecycleOwner,
         Observer<List<FirebaseTrack>> {
-          trackAdapter.submitList(it)
-          songHashMap = Helper().hashMapFromFirebaseTrack(it)
+          trackAdapter.submitList(it.sortedBy { it.name })
+          //firebaseRecents.postValue(it)
+          //songHashMap = Helper().hashMapFromFirebaseTrack(it)
+          firebaseRecents.value = it
         })
 
+  }
+
+  private fun uploadWithHandlingDuplicates() {
+    var songHashMap = HashMap<String, FirebaseTrack>()
+    var simpleTrackArray = ArrayList<FirebaseTrack>()
+
+
+    databaseReference.child("Songs").runTransaction(object : Transaction.Handler {
+      override fun doTransaction(mutableData: MutableData): Transaction.Result {
+        simpleTrackArray.clear()
+        val p = mutableData.children.mapNotNullTo(simpleTrackArray) {
+          it.getValue<FirebaseTrack>(FirebaseTrack::class.java)
+        }
+        songHashMap = Helper().hashMapFromFirebaseTrack(p)
+        if (!songHashMap.isEmpty()) {
+          firebaseRecents.value!!.forEach {
+            if (songHashMap.contains(it.uri)) {
+              (songHashMap[it.uri] as FirebaseTrack).amount++
+            }
+          }
+        } else
+          songHashMap = Helper().hashMapFromFirebaseTrack(firebaseRecents.value!!)
+
+        return Transaction.success(mutableData)
+      }
+
+      override fun onComplete(databaseError: DatabaseError?, b: Boolean,
+          dataSnapshot: DataSnapshot?) {
+        uploadToFirebase(songHashMap)
+
+      }
+    })
   }
 
 

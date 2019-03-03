@@ -6,6 +6,7 @@ import com.wasseemb.musicplayersample.fragments.TrackFragment
 import com.wasseemb.musicplayersample.NavigationActivity
 import com.wasseemb.musicplayersample.SpotifyRepository
 import com.wasseemb.musicplayersample.dagger2.SpotifyViewModelFactoryModule
+import com.wasseemb.musicplayersample.fragments.QueueTrackFragment
 import dagger.Component
 
 
@@ -18,7 +19,7 @@ interface ApplicationComponent {
 
   fun inject(trackFragment: TrackFragment)
   fun inject(recentlyPlayedFragment: RecentlyPlayedFragment)
-
+  fun inject(queueTrackFragment: QueueTrackFragment)
   fun inject(navigationActivity: NavigationActivity)
 
   //fun getSpotifyService(): SpotifyApiService

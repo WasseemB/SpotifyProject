@@ -20,9 +20,9 @@ import com.wasseemb.musicplayersample.api.HeaderInterceptor
 import com.wasseemb.musicplayersample.dagger.DaggerApplicationComponent
 import com.wasseemb.musicplayersample.dagger.HeaderInterceptorModule
 import com.wasseemb.musicplayersample.dagger2.ContextModule
-import com.wasseemb.musicplayersample.fragments.FirebaseTrackFragment
 import com.wasseemb.musicplayersample.fragments.QRFragment
 import com.wasseemb.musicplayersample.fragments.QRReaderFragment
+import com.wasseemb.musicplayersample.fragments.QueueTrackFragment
 import com.wasseemb.musicplayersample.fragments.RecentlyPlayedFragment
 import com.wasseemb.musicplayersample.fragments.TrackFragment
 import com.wasseemb.musicplayersample.utils.REQUEST_CODE
@@ -175,7 +175,8 @@ class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         newFragment = TrackFragment.newInstance()
       }
       R.id.nav_player -> {
-        newFragment = FirebaseTrackFragment.newInstance(authToken, playlistId)
+        //newFragment = FirebaseTrackFragment.newInstance(authToken, playlistId)
+        newFragment = QueueTrackFragment.newInstance(authToken)
       }
 
       R.id.qr_fragment -> {

@@ -18,8 +18,11 @@ interface FirebaseTrackDao {
   fun update(firebaseTrack: FirebaseTrack)
 
 
-  @get:Query("SELECT * FROM firebase_tracks WHERE type ='normal'")
+  @get:Query("SELECT * FROM firebase_tracks")
   val all: LiveData<List<FirebaseTrack>>
+
+  @get:Query("SELECT * FROM firebase_tracks WHERE type ='normal'")
+  val track: LiveData<List<FirebaseTrack>>
 
   @get:Query("SELECT * FROM firebase_tracks WHERE type='recent'")
   val recent: LiveData<List<FirebaseTrack>>

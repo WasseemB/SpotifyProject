@@ -15,8 +15,9 @@ import io.reactivex.schedulers.Schedulers
 class SpotifyRepository(private val spotifyApiService: SpotifyApiService,
     private val firebaseTrackDao: FirebaseTrackDao) {
 
-  fun getSpotifyTracks(): LiveData<List<FirebaseTrack>> = firebaseTrackDao.all
+  fun getSpotifyTracks(): LiveData<List<FirebaseTrack>> = firebaseTrackDao.track
   fun getSpotifyRecents(): LiveData<List<FirebaseTrack>> = firebaseTrackDao.recent
+  fun getSpotifyAll(): LiveData<List<FirebaseTrack>> = firebaseTrackDao.all
 
   @SuppressLint("CheckResult")
   fun getRemoteTracks() {
@@ -37,6 +38,23 @@ class SpotifyRepository(private val spotifyApiService: SpotifyApiService,
 
   @SuppressLint("CheckResult")
   fun getRemoteRecentlyPlayed() {
+    spotifyApiService.getRecentlyPlayed().observeOn(
+        Schedulers.computation())
+        .subscribeOn(Schedulers.io())
+        .toObservable()
+        //Retain orignal value of the stream before sideeffects
+        .flatMap { tracks ->
+          Observable.fromIterable(tracks.items)
+        }
+        .subscribe { result ->
+          firebaseTrackDao.insert(FirebaseTrack(
+              artist = result.track.artists[0].name, name = result.track.name,
+              uri = result.track.uri,
+              albumImageUrl = "", type = "recent"))
+        }
+  }
+
+  fun getRemoteRecentlyPlayed1() {
     spotifyApiService.getRecentlyPlayed()
         .observeOn(Schedulers.computation())
         .subscribeOn(Schedulers.io())
@@ -51,8 +69,11 @@ class SpotifyRepository(private val spotifyApiService: SpotifyApiService,
                     FirebaseTrack(artist = it.artists[0].name, name = it.name, uri = it.uri,
                         albumImageUrl = it.album.images[0].url, type = "recent"))
               }
+
+
         }
   }
+
 
   fun getUserData(): Single<UserResponse> {
     return spotifyApiService.getUserData().observeOn(

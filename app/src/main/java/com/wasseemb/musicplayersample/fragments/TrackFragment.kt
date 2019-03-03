@@ -22,9 +22,9 @@ import com.wasseemb.musicplayersample.R.layout
 import com.wasseemb.musicplayersample.SpotifyViewModel
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter.DisplayableTrackClickListener
+import com.wasseemb.musicplayersample.extensions.uploadToFirebase
 import com.wasseemb.musicplayersample.utils.Helper
 import com.wasseemb.musicplayersample.utils.SpotifyHelper
-import com.wasseemb.musicplayersample.extensions.uploadToFirebase
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
 import javax.inject.Inject
 
@@ -59,11 +59,14 @@ class TrackFragment : Fragment(), DisplayableTrackClickListener {
     // Inflate the layout for this fragment
     val rootView = inflater.inflate(layout.trackitemdata_list, container, false)
     val fab = activity?.findViewById<MaterialButton>(R.id.fab)
-    fab?.text = "Upload to firebase"
-    fab?.icon = ContextCompat.getDrawable(context!!,
-        drawable.ic_upload)
-    fab?.setOnClickListener {
-      uploadToFirebase(songHashMap)
+    fab?.let {
+      it.text = "Upload to firebase"
+      it.icon = ContextCompat.getDrawable(context!!,
+          drawable.ic_upload)
+      it.setOnClickListener {
+        uploadToFirebase(songHashMap)
+      }
+
     }
 
     spotifyViewModel = ViewModelProviders.of(this, viewModelFactory)[SpotifyViewModel::class.java]

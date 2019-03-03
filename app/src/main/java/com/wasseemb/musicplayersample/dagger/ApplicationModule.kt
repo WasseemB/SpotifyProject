@@ -2,11 +2,13 @@ package com.wasseemb.musicplayersample.dagger
 
 import android.content.Context
 import androidx.room.Room
-import com.wasseemb.musicplayersample.database.FirebaseTrackDao
-import com.wasseemb.musicplayersample.database.FirebaseTracksDatabase
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.wasseemb.musicplayersample.SpotifyRepository
 import com.wasseemb.musicplayersample.api.SpotifyApiService
 import com.wasseemb.musicplayersample.dagger2.ContextModule
+import com.wasseemb.musicplayersample.database.FirebaseTrackDao
+import com.wasseemb.musicplayersample.database.FirebaseTracksDatabase
 import dagger.Module
 import dagger.Provides
 
@@ -35,4 +37,12 @@ class ApplicationModule {
   fun provideFirebaseDao(firebaseTrackDatabase: FirebaseTracksDatabase): FirebaseTrackDao {
     return firebaseTrackDatabase.firebaseDao()
   }
+
+
+  @Provides
+  @ApplicationScope
+  fun provideFirebaseDatabaseReference(): DatabaseReference {
+    return FirebaseDatabase.getInstance().reference
+  }
+
 }
