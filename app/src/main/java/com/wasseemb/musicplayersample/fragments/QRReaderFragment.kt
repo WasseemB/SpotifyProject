@@ -3,27 +3,27 @@ package com.wasseemb.musicplayersample.fragments
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.annotation.NonNull
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
-import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.annotation.NonNull
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
 import com.wasseemb.musicplayersample.R
 import com.wasseemb.musicplayersample.R.layout
+import com.wasseemb.musicplayersample.utils.SpotifyHelper
 
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
-var dbvScanner: BarcodeView? = null
 
 /**
  * A simple [Fragment] subclass.
@@ -38,6 +38,8 @@ class QRReaderFragment : Fragment() {
   // TODO: Rename and change types of parameters
   private var param1: String? = null
   private var param2: String? = null
+  var dbvScanner: BarcodeView? = null
+
   //private var listener: OnFragmentInteractionListener? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,13 +56,13 @@ class QRReaderFragment : Fragment() {
     val view = inflater.inflate(layout.fragment_qreader, container, false)
     dbvScanner = view.findViewById<BarcodeView>(
         R.id.dbv_barcode)
-    val txtViewQr = view.findViewById<TextView>(R.id.qrRead)
+    val mtrlBtn = view.findViewById<MaterialButton>(R.id.connectSpotifyQR)
     requestPermission()
     dbvScanner?.cameraInstance?.cameraSettings?.requestedCameraId = 1
 
     dbvScanner?.decodeContinuous(object : BarcodeCallback {
       override fun barcodeResult(result: BarcodeResult) {
-        txtViewQr.text = result.text
+        mtrlBtn.text = result.text
         //updateText(result.text)
         //beepSound()
       }
@@ -69,6 +71,9 @@ class QRReaderFragment : Fragment() {
 
       }
     })
+    mtrlBtn.setOnClickListener {
+      SpotifyHelper().createAuthRequest(activity!!)
+    }
     return view
   }
 

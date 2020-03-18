@@ -21,7 +21,7 @@ import retrofit2.http.Query
 interface SpotifyApiService {
   @GET("me/tracks")
   fun getUserTracks(@Query("limit") limit: Int = 50)
-      : Observable<Tracks>
+      : Single<Tracks>
 
 
   @GET("tracks/{id}")

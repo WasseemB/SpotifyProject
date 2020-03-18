@@ -26,6 +26,7 @@ import com.wasseemb.musicplayersample.R.layout
 import com.wasseemb.musicplayersample.SpotifyViewModel
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter.DisplayableTrackClickListener
+import com.wasseemb.musicplayersample.extensions.PreferenceHelper
 import com.wasseemb.musicplayersample.extensions.uploadToFirebase
 import com.wasseemb.musicplayersample.utils.Helper
 import com.wasseemb.musicplayersample.utils.SpotifyHelper
@@ -33,7 +34,7 @@ import com.wasseemb.musicplayersample.vo.FirebaseTrack
 import javax.inject.Inject
 
 
-class RecentlyPlayedFragment : Fragment(), DisplayableTrackClickListener {
+class RecentlyPlayedFragment @Inject constructor() : Fragment(), DisplayableTrackClickListener {
   override fun onItemClick(item: FirebaseTrack) {
     spotifyAppRemote = SpotifyHelper().playTrack(item, context)
   }
@@ -55,7 +56,7 @@ class RecentlyPlayedFragment : Fragment(), DisplayableTrackClickListener {
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
       savedInstanceState: Bundle?): View? {
     // Inflate the layout for this fragment
-    val rootView = inflater.inflate(layout.trackitemdata_list, container, false)
+    val rootView = inflater.inflate(layout.firebase_list, container, false)
 
     val fab = activity?.findViewById<MaterialButton>(R.id.fab)
     fab?.visibility = View.VISIBLE
@@ -88,7 +89,7 @@ class RecentlyPlayedFragment : Fragment(), DisplayableTrackClickListener {
 
 
   private fun setupRecyclerView(view: View) {
-    val recyclerView = view.findViewById<RecyclerView>(R.id.trackitemdata_list)
+    val recyclerView = view.findViewById<RecyclerView>(R.id.firebase_list)
     recyclerView.layoutManager = LinearLayoutManager(context,
         RecyclerView.VERTICAL, false) as LayoutManager?
     trackAdapter = FirebaseTrackAdapter()
@@ -115,8 +116,9 @@ class RecentlyPlayedFragment : Fragment(), DisplayableTrackClickListener {
     var songHashMap = HashMap<String, FirebaseTrack>()
     var simpleTrackArray = ArrayList<FirebaseTrack>()
 
-
-    databaseReference.child("Songs").runTransaction(object : Transaction.Handler {
+    val roomName = PreferenceHelper.defaultPrefs(context!!).getString(
+        getString(R.string.room_name_preference), "")
+    databaseReference.child(roomName).runTransaction(object : Transaction.Handler {
       override fun doTransaction(mutableData: MutableData): Transaction.Result {
         simpleTrackArray.clear()
         val p = mutableData.children.mapNotNullTo(simpleTrackArray) {
@@ -137,7 +139,7 @@ class RecentlyPlayedFragment : Fragment(), DisplayableTrackClickListener {
 
       override fun onComplete(databaseError: DatabaseError?, b: Boolean,
           dataSnapshot: DataSnapshot?) {
-        uploadToFirebase(songHashMap)
+        uploadToFirebase(songHashMap, roomName)
 
       }
     })

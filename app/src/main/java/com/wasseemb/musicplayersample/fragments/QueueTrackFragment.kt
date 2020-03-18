@@ -23,6 +23,7 @@ import com.wasseemb.musicplayersample.R.drawable
 import com.wasseemb.musicplayersample.R.layout
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter
 import com.wasseemb.musicplayersample.Track.FirebaseTrackAdapter.DisplayableTrackClickListener
+import com.wasseemb.musicplayersample.extensions.PreferenceHelper
 import com.wasseemb.musicplayersample.repositories.DummySwipeRepository
 import com.wasseemb.musicplayersample.utils.SpotifyHelper
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
@@ -56,7 +57,7 @@ class QueueTrackFragment : Fragment(), DisplayableTrackClickListener {
   lateinit var recyclerView: RecyclerView
   lateinit var trackAdapter: FirebaseTrackAdapter
   // TODO: Rename and change types of parameters
-  private var token: String? = null
+  //private var token: String? = null
   private var simpleTrackArray = ArrayList<FirebaseTrack>()
   private var uriArray = ArrayList<String>()
   lateinit var materialButton: MaterialButton
@@ -72,7 +73,7 @@ class QueueTrackFragment : Fragment(), DisplayableTrackClickListener {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     arguments?.let {
-      token = it.getString(ARG_PARAM1)
+      //token = it.getString(ARG_PARAM1)
     }
   }
 
@@ -83,12 +84,12 @@ class QueueTrackFragment : Fragment(), DisplayableTrackClickListener {
     setupRecyclerView(rootView)
     getTracksFromFirebase()
 
-    materialButton = activity!!.findViewById<MaterialButton>(
-        R.id.fab)
-    materialButton.text = "Play firebase playlist"
-//    materialButton.setOnClickListener {
-//      playTracks(param2!!)
-//    }
+//    materialButton = activity!!.findViewById<MaterialButton>(
+//        R.id.fab)
+//    materialButton.text = "Play firebase playlist"
+////    materialButton.setOnClickListener {
+////      playTracks(param2!!)
+////    }
     return rootView
 
   }
@@ -118,7 +119,9 @@ class QueueTrackFragment : Fragment(), DisplayableTrackClickListener {
         println("loadPost:onCancelled ${databaseError.toException()}")
       }
     }
-    databaseReference.child("Songs").addListenerForSingleValueEvent(menuListener)
+    val roomName = PreferenceHelper.defaultPrefs(context!!).getString(
+        getString(R.string.room_name_preference), "")
+    databaseReference.child(roomName).addValueEventListener(menuListener)
 
   }
 
@@ -135,6 +138,8 @@ class QueueTrackFragment : Fragment(), DisplayableTrackClickListener {
   }
 
   private fun setupRecyclerView(view: View) {
+    val roomName = PreferenceHelper.defaultPrefs(context!!).getString(
+        getString(R.string.room_name_preference), "")
     recyclerView = view.findViewById(R.id.firebase_list)
     val covert = Covert.with(covertConfig)
         .setIsActiveCallback {
@@ -151,7 +156,7 @@ class QueueTrackFragment : Fragment(), DisplayableTrackClickListener {
             simpleTrackArray[viewHolder.adapterPosition].vote--
           val database = FirebaseDatabase.getInstance()
           database.reference.child(
-              "Songs/" + simpleTrackArray[viewHolder.adapterPosition].uri).setValue(
+              "${roomName}/" + simpleTrackArray[viewHolder.adapterPosition].uri).setValue(
               simpleTrackArray[viewHolder.adapterPosition])
           trackAdapter.notifyItemChanged(viewHolder.adapterPosition)
 
@@ -182,10 +187,10 @@ class QueueTrackFragment : Fragment(), DisplayableTrackClickListener {
      */
     // TODO: Rename and change types and number of parameters
     @JvmStatic
-    fun newInstance(authToken: String) =
+    fun newInstance() =
         QueueTrackFragment().apply {
           arguments = Bundle().apply {
-            putString(ARG_PARAM1, authToken)
+            //putString(ARG_PARAM1, authToken)
           }
         }
   }

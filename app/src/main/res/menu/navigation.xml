@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
   <item
-      android:id="@+id/action_settings"
-      android:orderInCategory="100"
-      android:title="@string/action_settings"
-      app:showAsAction="never"/>
+      android:id="@+id/navigation_home"
+      android:icon="@drawable/ic_home_black_24dp"
+      android:title="@string/title_local"/>
+
+  <item
+      android:id="@+id/navigation_dashboard"
+      android:icon="@drawable/ic_dashboard_black_24dp"
+      android:title="@string/title_online"/>
+
+  <!--<item-->
+      <!--android:id="@+id/navigation_preferences"-->
+      <!--android:icon="@android:drawable/ic_menu_preferences"-->
+      <!--android:title="@string/title_preferences"/>-->
 </menu>

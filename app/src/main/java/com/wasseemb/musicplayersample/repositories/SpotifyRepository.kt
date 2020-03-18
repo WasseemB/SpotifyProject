@@ -24,15 +24,20 @@ class SpotifyRepository(private val spotifyApiService: SpotifyApiService,
     spotifyApiService.getUserTracks().observeOn(
         Schedulers.computation())
         .subscribeOn(Schedulers.io())
+        .toObservable()
         //Retain orignal value of the stream before sideeffects
         .flatMap { tracks ->
-          Observable.fromIterable(tracks.items)
+          Observable.fromIterable(tracks.items).map { result ->
+            FirebaseTrack(
+                artist = result.track.artists[0].name, name = result.track.name,
+                uri = result.track.uri,
+                albumImageUrl = result.track.album.images[0].url, type = "normal")
+          }
+              .toList()
+              .toObservable()
         }
         .subscribe { result ->
-          firebaseTrackDao.insert(FirebaseTrack(
-              artist = result.track.artists[0].name, name = result.track.name,
-              uri = result.track.uri,
-              albumImageUrl = result.track.album.images[0].url, type = "normal"))
+          firebaseTrackDao.insert(result)
         }
   }
 
@@ -44,13 +49,17 @@ class SpotifyRepository(private val spotifyApiService: SpotifyApiService,
         .toObservable()
         //Retain orignal value of the stream before sideeffects
         .flatMap { tracks ->
-          Observable.fromIterable(tracks.items)
+          Observable.fromIterable(tracks.items).map { result ->
+            FirebaseTrack(
+                artist = result.track.artists[0].name, name = result.track.name,
+                uri = result.track.uri,
+                albumImageUrl = "", type = "recent")
+          }
+              .toList()
+              .toObservable()
         }
         .subscribe { result ->
-          firebaseTrackDao.insert(FirebaseTrack(
-              artist = result.track.artists[0].name, name = result.track.name,
-              uri = result.track.uri,
-              albumImageUrl = "", type = "recent"))
+          firebaseTrackDao.insert(result)
         }
   }
 

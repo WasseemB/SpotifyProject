@@ -9,6 +9,7 @@ import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationRequest
 import com.spotify.sdk.android.authentication.AuthenticationResponse
+import com.wasseemb.musicplayersample.fragments.SettingsFragment
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
 
 class SpotifyHelper {
@@ -24,6 +25,21 @@ class SpotifyHelper {
     val request = builder.build()
 
     AuthenticationClient.openLoginActivity(activty,
+        REQUEST_CODE,
+        request)
+  }
+
+  fun createAuthRequest(settingsFragment: SettingsFragment) {
+    val builder = AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN,
+        REDIRECT_URI)
+
+    builder.setScopes(
+        arrayOf("user-library-read", "user-read-private", "user-read-email", "streaming",
+            "playlist-read-private", "user-top-read", "app-remote-control",
+            "user-modify-playback-state", "playlist-modify-public", "playlist-modify-private",
+            "user-read-recently-played"))
+    val request = builder.build()
+    AuthenticationClient.openLoginActivity(settingsFragment.activity,
         REQUEST_CODE,
         request)
   }

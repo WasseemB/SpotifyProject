@@ -1,12 +1,15 @@
 package com.wasseemb.musicplayersample
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
 import javax.inject.Inject
 
 class SpotifyViewModel @Inject constructor(
     private val spotifyRepository: SpotifyRepository) : ViewModel() {
+  var token = MutableLiveData<String>()
+
 
   var displayableTrack: LiveData<List<FirebaseTrack>> = spotifyRepository.getSpotifyTracks()
   var displayableRecent: LiveData<List<FirebaseTrack>> = spotifyRepository.getSpotifyRecents()

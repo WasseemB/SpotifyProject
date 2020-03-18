@@ -14,7 +14,6 @@
       android:supportsRtl="true"
       android:theme="@style/AppTheme">
 
-
     <provider
         android:name="androidx.core.content.FileProvider"
         android:authorities="com.wasseemb.fileprovider"
@@ -26,7 +25,7 @@
     </provider>
 
     <activity
-        android:name=".NavigationActivity"
+        android:name=".MainActivity"
         android:label="@string/app_name">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -53,6 +52,7 @@
         android:name="com.spotify.sdk.android.authentication.LoginActivity"
         android:theme="@android:style/Theme.Translucent.NoTitleBar">
     </activity>
+    <activity android:name=".BottomNavigationActivity"/>
   </application>
 
 </manifest>

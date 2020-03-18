@@ -28,9 +28,9 @@ fun ViewGroup.inflate(layoutId: Int, attachToRoot: Boolean = false): View {
 }
 
 
-fun uploadToFirebase(firebaseArray: Map<String, FirebaseTrack>) {
+fun uploadToFirebase(firebaseArray: Map<String, FirebaseTrack>, roomName: String) {
   val rootRef = FirebaseDatabase.getInstance().reference
-  rootRef.child("Songs").updateChildren(firebaseArray)
+  rootRef.child(roomName).updateChildren(firebaseArray)
   //rootRef.child("Songs").push().setValue(firebaseArray)
 //      .addOnCompleteListener {
 //        Snackbar.make(view!!, "Upload Complete", Snackbar.LENGTH_LONG)

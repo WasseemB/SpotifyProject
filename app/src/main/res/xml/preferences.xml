@@ -1,0 +1,31 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Settings">
+
+  <PreferenceCategory
+      android:title="Room Settings">
+    <Preference
+        android:key="@string/generate_preference"
+        android:title="Generate QR code"/>
+    <Preference
+        android:icon="@android:drawable/ic_menu_camera"
+        android:key="@string/qr_scan_preference"
+        android:summary="Scan code to upload spotify songs to room"
+        android:title="Scan QR code"/>
+    <EditTextPreference
+        android:dialogTitle="Enter name"
+        android:key="@string/room_name_preference"
+        android:summary="Connect to given room manually"
+        android:title="Room name"/>
+  </PreferenceCategory>
+  <PreferenceCategory
+      android:title="Spotify"
+      >
+    <Preference
+        android:icon="@drawable/ic_spotify"
+        android:key="@string/spotify_preference"
+        android:title="Connect to Spotify"/>
+
+  </PreferenceCategory>
+
+</PreferenceScreen>

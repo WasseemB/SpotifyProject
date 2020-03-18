@@ -8,11 +8,15 @@ import androidx.room.Query
 import androidx.room.Update
 import com.wasseemb.musicplayersample.vo.FirebaseTrack
 
+
 @Dao
 interface FirebaseTrackDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insert(firebaseTrack: FirebaseTrack)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  fun insert(firebaseTrack: List<FirebaseTrack>)
 
   @Update
   fun update(firebaseTrack: FirebaseTrack)
